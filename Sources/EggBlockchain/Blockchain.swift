@@ -7,6 +7,7 @@
 
 import Foundation
 
+// MARK: - Structs
 struct Block: Codable {
 	var index: Int64
 	var timestamp: Date
