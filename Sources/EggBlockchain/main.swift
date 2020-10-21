@@ -5,23 +5,25 @@
 //  Created by Ryan Bosher on 24/08/20.
 //
 
-import Kitura
-import Foundation
 import CryptoSwift
+import Foundation
+import Kitura
 import KituraNet
 import SwiftyRequest
 
 class Blockchain: Chain {
 	// MARK: - Properties
+
 	var chain: [Block]
 	var current_transactions: [Transaction]
 	var nodes: Set<String>
 	
 	// MARK: - Initializers
+
 	init() {
-		chain = []
-		current_transactions = []
-		nodes = Set()
+		self.chain = []
+		self.current_transactions = []
+		self.nodes = Set()
 		
 		// Create the genesis block
 		self.newBlock(previous_hash: "1", proof: 100)
@@ -32,11 +34,10 @@ class Blockchain: Chain {
 	@discardableResult
 	func newBlock(previous_hash: String?, proof: Int64) -> Block {
 		let block = Block(index: Int64(self.chain.count + 1),
-						  timestamp: Date(),
-						  transactions: self.current_transactions,
-						  proof: proof,
-						  previous_hash: previous_hash ?? self.hash(block: self.last_block)
-		)
+		                  timestamp: Date(),
+		                  transactions: self.current_transactions,
+		                  proof: proof,
+		                  previous_hash: previous_hash ?? self.hash(block: self.last_block))
 		
 		// Reset the current list of transactions
 		self.current_transactions = []
@@ -148,7 +149,7 @@ class Blockchain: Chain {
 					let length = response_data.length
 					let chain = response_data.chain
 					
-					if length > max_length && self.validChain(chain) {
+					if length > max_length, self.validChain(chain) {
 						max_length = length
 						new_chain = chain
 					}
@@ -168,12 +169,10 @@ class Blockchain: Chain {
 		
 		return false
 	}
-	
 }
 
 // Instance of blockchain
 let blockchain = Blockchain()
-
 
 // Create a new router
 let router = Router()
@@ -181,15 +180,15 @@ router.all(middleware: BodyParser())
 
 // Handle HTTP GET requests to /
 router.get("/") {
-	request, response, next in
-	defer {next()}
+	_, response, next in
+	defer { next() }
 	response.status(.OK)
 	response.send("Welcome to EggChain, URL options are: /mine, /chain, /transactions/new, /nodes/register, /nodes/resolve")
 }
 
 router.get("/mine") {
-	request, response, next in
-	defer {next()}
+	_, response, next in
+	defer { next() }
 	
 	let last_block = blockchain.last_block
 	let last_proof = last_block.proof
@@ -211,30 +210,30 @@ router.get("/mine") {
 		let previous_hash: String
 	}
 	let response_data = ResponseData(message: "New Block Mined",
-									 index: block.index,
-									 transactions: block.transactions,
-									 proof: proof,
-									 previous_hash: previous_hash)
+	                                 index: block.index,
+	                                 transactions: block.transactions,
+	                                 proof: proof,
+	                                 previous_hash: previous_hash)
 	response.status(.OK)
 	response.send(response_data)
 }
 
 router.post("/transactions/new") {
 	request, response, next in
-	defer {next()}
+	defer { next() }
 	
 	guard let body = request.body?.asJSON,
-		  let sender = body["sender"] as? String,
-		  let recipient = body["recipient"] as? String,
-		  let amount = body["amount"] as? Int64,
-		  let code = body["code"] as? String,
-		  let type = body["type"] as? String
+	      let sender = body["sender"] as? String,
+	      let recipient = body["recipient"] as? String,
+	      let amount = body["amount"] as? Int64,
+	      let code = body["code"] as? String,
+	      let type = body["type"] as? String
 	else {
 		response.status(.badRequest)
 		response.send("Missing values")
 		return
 	}
-	let timestamp: Date = Date()
+	let timestamp = Date()
 	let index = blockchain.newTransaction(sender: sender, recipient: recipient, amount: amount, code: code, type: type, timestamp: timestamp)
 	struct ResponseData: Encodable {
 		let message: String
@@ -244,10 +243,9 @@ router.post("/transactions/new") {
 	response.send(response_data)
 }
 
-
 router.get("/chain") {
-	request, response, next in
-	defer {next()}
+	_, response, next in
+	defer { next() }
 	struct ResponseData: Encodable {
 		let chain: [Block]
 		let length: Int
@@ -260,10 +258,10 @@ router.get("/chain") {
 
 router.post("/nodes/register") {
 	request, response, next in
-	defer {next()}
+	defer { next() }
 	
 	guard let body = request.body?.asJSON,
-		  let nodes = body["nodes"] as? [String]
+	      let nodes = body["nodes"] as? [String]
 	else {
 		response.status(.badRequest)
 		response.send("Error: Please supply a valid list of nodes")
@@ -285,8 +283,8 @@ router.post("/nodes/register") {
 }
 
 router.get("/nodes/resolve") {
-	request, response, next in
-	defer {next()}
+	_, response, next in
+	defer { next() }
 	
 	let replaced = blockchain.resolveConflicts()
 	response.status(.OK)

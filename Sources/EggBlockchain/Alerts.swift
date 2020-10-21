@@ -1,6 +1,6 @@
 //
 //  Alerts.swift
-//  
+//
 //
 //  Created by Ryan Bosher on 28/08/20.
 //
@@ -8,7 +8,6 @@
 import Foundation
 
 enum Alerts {
-	
 	func notify() {
 		let process = Process()
 		process.launchPath = launchPath
@@ -29,7 +28,7 @@ enum Alerts {
 	
 	private var arguments: [String] {
 		#if os(Linux)
-		return ["EggBlockchain", self.description]
+		return ["EggBlockchain", description]
 		#else
 		return ["-e", "display notification \"Server started on port: 5000\" with title \"EggBlockchain\""]
 		#endif

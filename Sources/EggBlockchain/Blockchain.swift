@@ -26,10 +26,10 @@ struct Transaction: Codable {
 
 protocol Chain: class {
 	// MARK: - Properties
-	var chain: [Block] {get}
-	var current_transactions: [Transaction] {get}
-	var nodes: Set<String> {get}
-	
+
+	var chain: [Block] { get }
+	var current_transactions: [Transaction] { get }
+	var nodes: Set<String> { get }
 	
 	// MARK: - Methods
 	
@@ -57,9 +57,9 @@ protocol Chain: class {
 	func newTransaction(sender: String, recipient: String, amount: Int64, code: String, type: String, timestamp: Date) -> Int64
 	
 	/**
-	Returns the last Block in the chain
-	 */
-	var last_block: Block {get}
+	 Returns the last Block in the chain
+	*/
+	var last_block: Block { get }
 	
 	/**
 	 Creates a SHA-256 hash of a Block
@@ -89,7 +89,6 @@ protocol Chain: class {
 	 - returns: True if correct, False if not.
 	 */
 	func validProof(last_proof: Int64, proof: Int64) -> Bool
-	
 	
 	/**
 	 Add a new node to the list of nodes
