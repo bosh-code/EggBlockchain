@@ -227,13 +227,14 @@ router.post("/transactions/new") {
 	      let recipient = body["recipient"] as? String,
 	      let amount = body["amount"] as? Int64,
 	      let code = body["code"] as? String,
-	      let type = body["type"] as? String
+	      let type = body["type"] as? String,
+		  let timestamp = body["timestamp"] as? Date
 	else {
 		response.status(.badRequest)
 		response.send("Missing values")
 		return
 	}
-	let timestamp = Date()
+//	let timestamp = Date()
 	let index = blockchain.newTransaction(sender: sender, recipient: recipient, amount: amount, code: code, type: type, timestamp: timestamp)
 	struct ResponseData: Encodable {
 		let message: String
@@ -305,6 +306,7 @@ router.get("/nodes/resolve") {
 	}
 }
 
+// MARK: - Server start
 // Add an HTTP server and connect it to the router
 Kitura.addHTTPServer(onPort: 5000, with: router)
 
