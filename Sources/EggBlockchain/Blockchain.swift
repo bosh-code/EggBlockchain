@@ -22,7 +22,7 @@ struct Transaction: Codable {
 	var amount: Int64
 	var code: String
 	var type: String
-	var timestamp: Date
+	var timestamp: String
 }
 
 protocol Chain: class {
@@ -55,7 +55,7 @@ protocol Chain: class {
 	 - Parameter timestamp: Transaction time, handled by this node.
 	 - returns: The index of the Block that will hold this transaction
 	 */
-	func newTransaction(sender: String, recipient: String, amount: Int64, code: String, type: String, timestamp: Date) -> Int64
+	func newTransaction(sender: String, recipient: String, amount: Int64, code: String, type: String, timestamp: String) -> Int64
 	
 	/**
 	 Returns the last Block in the chain

@@ -47,7 +47,7 @@ class Blockchain: Chain {
 	}
 	
 	@discardableResult
-	func newTransaction(sender: String, recipient: String, amount: Int64, code: String, type: String, timestamp: Date) -> Int64 {
+	func newTransaction(sender: String, recipient: String, amount: Int64, code: String, type: String, timestamp: String) -> Int64 {
 		let transaction = Transaction(sender: sender, recipient: recipient, amount: amount, code: code, type: type, timestamp: timestamp)
 		self.current_transactions.append(transaction)
 		
@@ -193,10 +193,12 @@ router.get("/mine") {
 	let last_block = blockchain.last_block
 	let last_proof = last_block.proof
 	let proof = blockchain.proofOfWork(last_proof: last_proof)
-	
+	let dateFormatter = DateFormatter()
+	dateFormatter.dateFormat = "yyyy-MM-dd hh:mm:ss"
+	let currentTime = dateFormatter.string(from: Date())
 	// We must receive a reward for finding the proof.
 	// The sender is "0" to signify that this node has mined a new coin.
-	_ = blockchain.newTransaction(sender: "0", recipient: blockchain.node_identifier, amount: 1, code: "BLOCK", type: "MINE TRANSACTION", timestamp: Date())
+	_ = blockchain.newTransaction(sender: "0", recipient: blockchain.node_identifier, amount: 1, code: "BLOCK", type: "MINE TRANSACTION", timestamp: currentTime)
 	
 	// Forge the new Block by adding it to the chain
 	let previous_hash = blockchain.hash(block: last_block)
@@ -227,13 +229,13 @@ router.post("/transactions/new") {
 	      let recipient = body["recipient"] as? String,
 	      let amount = body["amount"] as? Int64,
 	      let code = body["code"] as? String,
-	      let type = body["type"] as? String
+	      let type = body["type"] as? String,
+		  let timestamp = body["timestamp"] as? String
 	else {
 		response.status(.badRequest)
 		response.send("Missing values")
 		return
 	}
-	let timestamp = Date()
 	let index = blockchain.newTransaction(sender: sender, recipient: recipient, amount: amount, code: code, type: type, timestamp: timestamp)
 	struct ResponseData: Encodable {
 		let message: String
@@ -305,6 +307,7 @@ router.get("/nodes/resolve") {
 	}
 }
 
+// MARK: - Server start
 // Add an HTTP server and connect it to the router
 Kitura.addHTTPServer(onPort: 5000, with: router)
 
